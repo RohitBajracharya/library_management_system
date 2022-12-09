@@ -8,47 +8,98 @@ package jframe;
 import java.sql.*;
 import javax.swing.*;
 
-
 /**
  *
  * @author user
  */
 public class SignupPage extends javax.swing.JFrame {
-    static PreparedStatement pst=null;
+
+    static PreparedStatement pst = null;
+
     /**
      * Creates new form SignupPage
      */
     public SignupPage() {
         initComponents();
     }
+
     //method to insert values into users table
-    public void insertSignupDetails(){
-        String name=txt_username.getText();
-        String pwd=txt_password.getText();
-        String email=txt_email.getText();
-        String contact=txt_contact.getText();
-      
-        try{
-           Connection con=DBConnection.getConnection();
-           String sql="insert into users(name,password,email,contact) values(?,?,?,?)";
-              System.out.println("name: "+name+" password: "+pwd+" email: "+email+" contact: "+contact);
-           pst=con.prepareStatement(sql);          
-            
-           pst.setString(1, name);
-           pst.setString(2, pwd);
-           pst.setString(3, email);
-           pst.setString(4, contact);
-           int updatedRowCount= pst.executeUpdate();
-           if(updatedRowCount>0){
-               JOptionPane.showMessageDialog(this,"Recorded Inserted Successfully");
-           }  else{
-               JOptionPane.showMessageDialog(this,"Recorded Inserted Failure");
-           }      
-                    
-        }catch(Exception e){
+    public void insertSignupDetails() {
+        String name = txt_username.getText();
+        String pwd = txt_password.getText();
+        String email = txt_email.getText();
+        String contact = txt_contact.getText();
+
+        try {
+            Connection con = DBConnection.getConnection();
+            String sql = "insert into users(name,password,email,contact) values(?,?,?,?)";
+            System.out.println("name: " + name + " password: " + pwd + " email: " + email + " contact: " + contact);
+            pst = con.prepareStatement(sql);
+
+            pst.setString(1, name);
+            pst.setString(2, pwd);
+            pst.setString(3, email);
+            pst.setString(4, contact);
+            int updatedRowCount = pst.executeUpdate();
+            if (updatedRowCount > 0) {
+                JOptionPane.showMessageDialog(this, "Recorded Inserted Successfully");
+                LoginPage page=new LoginPage();
+                page.setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Recorded Inserted Failure");
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+//    validation for signup
+
+    public boolean validateSignup() {
+        String name = txt_username.getText();
+        String pwd = txt_password.getText();
+        String email = txt_email.getText();
+        String contact = txt_contact.getText();
+        if (name.equals("")) {
+            JOptionPane.showMessageDialog(this, "please enter username");
+            return false;
+        }
+        if (pwd.equals("")) {
+            JOptionPane.showMessageDialog(this, "please enter password");
+            return false;
+        }
+        if (email.equals("") || !email.matches("^.+@.+\\..+$")) {
+            JOptionPane.showMessageDialog(this, "please enter valid email");
+            return false;
+        }
+        if (contact.equals("")) {
+            JOptionPane.showMessageDialog(this, "please enter contact");
+            return false;
+        }
+        return true;
+    }
+    
+//    check duplicate users
+    public boolean checkDuplicateUser(){
+        String name = txt_username.getText();
+        boolean isExist=false;
+        try{
+            Connection con=DBConnection.getConnection();
+            PreparedStatement pst=con.prepareStatement("Select * from users where name=?");
+            pst.setString(1, name);
+            ResultSet rs=pst.executeQuery();
+            if(rs.next()){
+                isExist=true;
+            }else{
+                isExist=false;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return isExist;
+     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -83,6 +134,7 @@ public class SignupPage extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         rSMaterialButtonCircle1 = new rojerusan.RSMaterialButtonCircle();
         rSMaterialButtonCircle2 = new rojerusan.RSMaterialButtonCircle();
+        jLabel16 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -107,6 +159,7 @@ public class SignupPage extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -145,10 +198,15 @@ public class SignupPage extends javax.swing.JFrame {
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/icons8_Account_50px.png"))); // NOI18N
         jPanel4.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, 50, 60));
 
-        jLabel7.setFont(new java.awt.Font("Microsoft YaHei UI Light", 1, 25)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("Signup Page");
-        jPanel4.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 120, -1, -1));
+        jLabel7.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 36)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel7.setText("X");
+        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel7MouseClicked(evt);
+            }
+        });
+        jPanel4.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 0, 30, -1));
 
         jLabel8.setFont(new java.awt.Font("Verdana", 0, 17)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -159,6 +217,11 @@ public class SignupPage extends javax.swing.JFrame {
         txt_username.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txt_username.setFont(new java.awt.Font("Tahoma", 0, 17)); // NOI18N
         txt_username.setPlaceholder("Enter Username.....");
+        txt_username.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_usernameFocusLost(evt);
+            }
+        });
         txt_username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_usernameActionPerformed(evt);
@@ -237,9 +300,14 @@ public class SignupPage extends javax.swing.JFrame {
         });
         jPanel4.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 640, 350, 80));
 
+        jLabel16.setFont(new java.awt.Font("Microsoft YaHei UI Light", 1, 25)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setText("Signup Page");
+        jPanel4.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 120, -1, -1));
+
         getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 0, 490, 830));
 
-        setSize(new java.awt.Dimension(1541, 875));
+        setSize(new java.awt.Dimension(1523, 828));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -252,8 +320,24 @@ public class SignupPage extends javax.swing.JFrame {
     }//GEN-LAST:event_rSMaterialButtonCircle1ActionPerformed
 
     private void rSMaterialButtonCircle2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2ActionPerformed
-        insertSignupDetails();
+        if (validateSignup() == true) {
+            if(checkDuplicateUser()==false){
+                            insertSignupDetails();
+            }else{
+                JOptionPane.showMessageDialog(this,"Username already exist");
+            }
+        }
     }//GEN-LAST:event_rSMaterialButtonCircle2ActionPerformed
+
+    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+        System.exit(0);
+    }//GEN-LAST:event_jLabel7MouseClicked
+
+    private void txt_usernameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_usernameFocusLost
+        if(checkDuplicateUser()== true){
+            JOptionPane.showMessageDialog(this,"Username already exist");
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_txt_usernameFocusLost
 
     /**
      * @param args the command line arguments
@@ -298,6 +382,7 @@ public class SignupPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
