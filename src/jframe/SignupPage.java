@@ -316,7 +316,9 @@ public class SignupPage extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_usernameActionPerformed
 
     private void rSMaterialButtonCircle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle1ActionPerformed
-        // TODO add your handling code here:
+        LoginPage page=new LoginPage();
+        page.setVisible(true);
+        this.dispose();        // TODO add your handling code here:
     }//GEN-LAST:event_rSMaterialButtonCircle1ActionPerformed
 
     private void rSMaterialButtonCircle2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2ActionPerformed
